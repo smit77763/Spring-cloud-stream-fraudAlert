@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: Fraud-Alert
+    
+  datasource:
+    url: jdbc:mysql://localhost:3306/my_newData?createDatabaseIfNotExist=true
+    username: root
+    password: smitshah
+    driver-class-name: com.mysql.jdbc.Driver
+
+    
+  cloud:
+    function:
+      definition: transactionFraudProcessor;fraudAlertNotifierService
+    stream:
+      default:
+        contentType: application/json
+#      function:
+#        definition: transactionFraudProcessor
+      bindings:
+        transactionFraudProcessor-in-0:
+          destination: transaction-created
+        transactionFraudProcessor-out-0:
+          destination: fraud-alert
+        fraudAlertNotifierService:
+          destination: fraud-alert
+      kafka:
+        binder:
+          brokers: localhost:9092
+          
+management:
+  endpoints:
+    web:
+      exposure:
+        include: bindings
+          
+  main:
+    allow-bean-definition-overriding: true
